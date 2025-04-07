@@ -5,27 +5,28 @@ pipeline {
         stage('SCM Checkout') {
             steps {
                 retry(3) {
-                    git branch: 'main', url: 'https://github.com/HGSChandeepa/test-node'
+                    git branch: 'main', url: 'https://github.com/ThusalDilhara/GitHub-Docker-and-Jenkins-CI-CD-Pipeline.git'
                 }
             }
         }
         stage('Build Docker Image') {
             steps {  
-                bat 'docker build -t adomicarts/nodeapp-cuban:%BUILD_NUMBER% .'
+                bat 'docker build -t thusal123/nodeapp_pipeline:%BUILD_NUMBER% .'
             }
         }
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([string(credentialsId: 'samin-docker', variable: 'samindocker')]) {
-                    script {
-                        bat "docker login -u adomicarts -p %samindocker%"
+                 script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    
                     }
                 }
             }
         }
         stage('Push Image') {
             steps {
-                bat 'docker push adomicarts/nodeapp-cuban:%BUILD_NUMBER%'
+                bat 'docker push thusal123/nodeapp_pipeline:%BUILD_NUMBER%'
             }
         }
     }
